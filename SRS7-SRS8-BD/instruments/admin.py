@@ -36,3 +36,8 @@ class InstrumentRequestEventAdmin(admin.ModelAdmin):
         "action", "created_at"
     )
     list_filter = ("action",)
+    search_fields = (
+        "request__id",
+        "initiator__username",
+        "comment",
+    )

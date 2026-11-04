@@ -53,7 +53,10 @@ class InstrumentRequestEventSerializer(serializers.ModelSerializer):
             "action",
             "action_display",
             "created_at",
-            "comment"
+            "comment",
+            "request_id_snapshot",
+            "instrument_name_snapshot",
+            "quantity_snapshot",
         )
         read_only_fields = fields
 

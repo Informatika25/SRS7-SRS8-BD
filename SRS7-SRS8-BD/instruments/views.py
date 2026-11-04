@@ -103,7 +103,6 @@ class InstrumentRequestViewSet(viewsets.ModelViewSet):
                     )
                 )
 
-
     def perform_destroy(self, instance):
         if instance.owner != self.request.user:
             raise PermissionDenied(
@@ -115,7 +114,27 @@ class InstrumentRequestViewSet(viewsets.ModelViewSet):
                 "Можно удалить только новую заявку."
             )
 
-        instance.delete()
+        with transaction.atomic():
+            # Сохраняем данные во всех старых событиях
+            instance.events.update(
+                request_id_snapshot=instance.id,
+                instrument_name_snapshot=instance.instrument.name,
+                quantity_snapshot=instance.quantity
+            )
+
+            # Создаём событие об удалении
+            InstrumentRequestEvent.objects.create(
+                request=instance,
+                request_id_snapshot=instance.id,
+                instrument_name_snapshot=instance.instrument.name,
+                quantity_snapshot=instance.quantity,
+                initiator=self.request.user,
+                action=InstrumentRequestEvent.Action.DELETED,
+                comment="Заявка удалена пользователем."
+            )
+
+            # Удаляем саму заявку
+            instance.delete()
 
     @action(detail=True, methods=["post"])
     def approve(self, request, pk=None):
@@ -266,3 +285,6 @@ class InstrumentRequestViewSet(viewsets.ModelViewSet):
         )
 
         return Response(serializer.data)
+
+
+

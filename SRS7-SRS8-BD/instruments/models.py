@@ -70,12 +70,29 @@ class InstrumentRequestEvent(models.Model):
         REJECTED = "rejected", "Отклонена"
         RETURNED = "returned", "Возвращена"
         EDITED = "edited", "Изменена"
+        DELETED = "deleted", "Удалена"
 
     request = models.ForeignKey(
         InstrumentRequest,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="events"
     )
+
+    request_id_snapshot = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+    instrument_name_snapshot = models.CharField(
+        max_length=50,
+        blank=True
+    )
+    quantity_snapshot = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+
     initiator = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
@@ -83,6 +100,7 @@ class InstrumentRequestEvent(models.Model):
         blank=True,
         related_name="instrument_request_events"
     )
+
     action = models.CharField(
         max_length=20,
         choices=Action.choices
@@ -91,4 +109,8 @@ class InstrumentRequestEvent(models.Model):
     comment = models.TextField(blank=True)
 
     def __str__(self):
-        return f"{self.get_action_display()} — заявка №{self.request.id}"
+        request_id = self.request_id or self.request_id_snapshot
+        return (
+            f"{self.get_action_display()} — "
+            f"заявка №{request_id or 'неизвестно'}"
+        )

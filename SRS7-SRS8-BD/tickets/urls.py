@@ -1,27 +1,6 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-
-from .views import (
-    dashboard,
-    CategoryViewSet,
-    TicketViewSet,
-)
-
-router = DefaultRouter()
-router.register(
-    "categories",
-    CategoryViewSet,
-    basename="categories"
-)
-
-
-router.register(
-    "tickets",
-    TicketViewSet,
-    basename="tickets"
-)
+from django.urls import path
+from .views import dashboard
 
 urlpatterns = [
     path("", dashboard, name = "dashboard.html"),
-    path("api/", include(router.urls)),
 ]
