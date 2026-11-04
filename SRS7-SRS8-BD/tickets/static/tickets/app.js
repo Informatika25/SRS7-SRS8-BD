@@ -81,11 +81,35 @@ async function apiRequest(url, options = {}) {
 }
 
 // Сообщения пользователю
+let messageTimeout;
+
+function hideMessage() {
+    clearTimeout(messageTimeout);
+    message.style.display = "none";
+}
+
 function showMessage(text, isError = false) {
+    clearTimeout(messageTimeout);
+
     message.textContent = text;
+
     message.className = isError
-        ? "alert alert-danger mb-3"
-        : "alert alert-success mb-3";
+        ? "alert alert-danger shadow"
+        : "alert alert-success shadow";
+
+    // Закрепляем уведомление в правом нижнем углу
+    message.style.position = "fixed";
+    message.style.bottom = "20px";
+    message.style.right = "20px";
+    message.style.top = "auto";
+    message.style.left = "auto";
+    message.style.zIndex = "99999";
+    message.style.maxWidth = "400px";
+    message.style.display = "block";
+
+    messageTimeout = setTimeout(() => {
+        hideMessage();
+    }, 4000);
 }
 
 // Создание HTML-элемента
