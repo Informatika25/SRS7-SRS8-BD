@@ -79,8 +79,29 @@ class InstrumentRequestViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         if serializer.instance.owner != self.request.user:
             raise PermissionDenied(
-                "Нельзя редактировать чужую заявку."
+                "Вы можете изменять только свои заявки."
             )
+
+        old_quantity = serializer.instance.quantity
+        old_instrument_id = serializer.instance.instrument_id
+
+        with transaction.atomic():
+            updated_request = serializer.save()
+
+            if (
+                    updated_request.quantity != old_quantity
+                    or updated_request.instrument_id != old_instrument_id
+            ):
+                InstrumentRequestEvent.objects.create(
+                    request=updated_request,
+                    initiator=self.request.user,
+                    action=InstrumentRequestEvent.Action.EDITED,
+                    comment=(
+                        f"Заявка изменена. "
+                        f"Количество: {old_quantity} → "
+                        f"{updated_request.quantity}."
+                    )
+                )
 
         serializer.save()
 

@@ -121,12 +121,7 @@ class InstrumentRequestSerializer(serializers.ModelSerializer):
             })
 
         if instrument and quantity is not None:
-            available_quantity = instrument.available_quantity
-
-            if self.instance:
-                available_quantity += self.instance.quantity
-
-            if quantity > available_quantity:
+            if quantity > instrument.available_quantity:
                 raise serializers.ValidationError({
                     "quantity": "Запрошенное количество превышает доступное."
                 })

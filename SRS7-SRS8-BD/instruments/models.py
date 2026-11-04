@@ -69,6 +69,7 @@ class InstrumentRequestEvent(models.Model):
         APPROVED = "approved", "Одобрена"
         REJECTED = "rejected", "Отклонена"
         RETURNED = "returned", "Возвращена"
+        EDITED = "edited", "Изменена"
 
     request = models.ForeignKey(
         InstrumentRequest,
