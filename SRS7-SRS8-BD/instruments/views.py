@@ -103,7 +103,6 @@ class InstrumentRequestViewSet(viewsets.ModelViewSet):
                     )
                 )
 
-        serializer.save()
 
     def perform_destroy(self, instance):
         if instance.owner != self.request.user:

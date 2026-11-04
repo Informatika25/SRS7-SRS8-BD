@@ -100,6 +100,12 @@ class InstrumentRequestSerializer(serializers.ModelSerializer):
         )
 
     def validate(self, attrs):
+
+        if self.instance and "status" in self.initial_data:
+            raise serializers.ValidationError({
+                "status": "Нельзя изменять статус напрямую. Используйте специальные действия."
+            })
+
         instrument = attrs.get(
             "instrument",
             self.instance.instrument if self.instance else None
